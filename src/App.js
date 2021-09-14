@@ -1,9 +1,11 @@
 import { Card, CardContent, FormControl, MenuItem, Select } from '@material-ui/core';
 import { useState, useEffect } from 'react';
 import './App.css';
+import Graph from './components/Graph';
 import InfoBox from './components/infoBox';
 import Map from './components/Map';
 import Table from './components/table'
+import { sortData } from './components/utilities/util';
 
 
 //https://disease.sh/v3/covid-19/countries
@@ -38,8 +40,9 @@ function App() {
               value: country.countryInfo.iso2
             }
           ))
+          const sortedData = sortData(data)
           setCountries(countries)
-          settableData(data)
+          settableData(sortedData)
         })
     }
     getCountryData()
@@ -104,6 +107,9 @@ function App() {
             <h3>Live Cases By Country</h3>
             <Table countries={tableData} />
             <h3>WorldWide New Cases</h3>
+            {/* Graph */}
+            <Graph />
+
           </CardContent>
         </Card>
 
