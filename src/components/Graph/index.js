@@ -4,57 +4,57 @@ import { Line } from "react-chartjs-2"
 import numeral from 'numeral';
 
 
-function Graph({ casesType = "cases" }) {
 
-    const option = {
-        type: 'line',
-        responsive: true,
-        legend: {
-            display: false,
+
+const options = {
+
+    legend: {
+        label: false,
+    },
+    elements: {
+        point: {
+            radius: 0,
         },
-        elements: {
-            point: {
-                radius: 0,
+    },
+    maintainAspectRatio: false,
+    tooltips: {
+        mode: "line",
+        intersect: false,
+        callbacks: {
+            label: function (tooltipItem, data) {
+                return numeral(tooltipItem.value).format("+0.0a")
             },
         },
-        maintainAspectRatio: false,
-        tooltips: {
-            mode: "line",
-            intersect: false,
-            callbacks: {
-                label: function (tooltipItem, data) {
-                    return numeral(tooltipItem.value).format("+0.0")
+    },
+    scales: {
+        xAxes: [
+            {
+                type: "time",
+                time: {
+                    format: "MM/DD/YY",
+                    tooltipformat: "ll"
+                }
+            }
+        ],
+        yAxes: [
+            {
+                gridLines: {
+                    display: false.valueOf,
                 },
-            },
-        },
-        scales: {
-            xAxes: [
-                {
-                    type: "time",
-                    time: {
-                        format: "MM/DD/YY",
-                        tooltipformat: "ll"
+                ticks: {
+                    callback: function (value, index, values) {
+                        return numeral(value).format("0.0a")
                     }
                 }
-            ],
-            yAxes: [
-                {
-                    gridLines: {
-                        display: false.valueOf,
-                    },
-                    ticks: {
-                        callback: function (value, index, values) {
-                            return numeral(value).format("0a")
-                        }
-                    }
-                }
-            ]
-        }
-    };
+            }
+        ]
+    }
+};
 
 
 
 
+function Graph({ casesType, ...props }) {
     const [data, setData] = useState({})
 
     useEffect(() => {
@@ -63,9 +63,9 @@ function Graph({ casesType = "cases" }) {
             await fetch("https://disease.sh/v3/covid-19/historical/all?lastdays=120")
                 .then((response) => response.json())
                 .then((data) => {
-                    const chartData = buildChartdata(data, "cases")
+                    const chartData = buildChartdata(data, casesType)
                     setData(chartData)
-
+                    console.log("graph====", data);
                 })
         }
 
@@ -74,7 +74,7 @@ function Graph({ casesType = "cases" }) {
 
     }, [casesType])
 
-    const buildChartdata = ((data, casesType = "cases") => {
+    const buildChartdata = ((data, casesType) => {
         const charteddata = []
         let lastPointData;
         for (let date in data.cases) {
@@ -91,16 +91,16 @@ function Graph({ casesType = "cases" }) {
     })
 
     return (
-        <div>
+        <div className={props.className}>
             {
                 data?.length > 0 &&
                 <Line
 
-                    options={option}
+                    options={options}
                     data={{
                         datasets: [
                             {
-                                label: 'Graph',
+                                label: 'Cases',
                                 backgroundColor: "rgba(204,16,52,0.5)",
                                 borderColor: "#CC1034",
                                 data: data
